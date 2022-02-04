@@ -37,70 +37,53 @@
             android:layout_columnSpan="4"
             android:text="C" />
 
-
         <Button
             android:id="@+id/b1"
             android:text="1" />
-
         <Button
             android:id="@+id/b2"
             android:text="2" />
-
         <Button
             android:id="@+id/b3"
             android:text="3" />
-
         <Button
             android:id="@+id/division"
             android:text="/" />
-
         <Button
             android:id="@+id/b4"
             android:text="4" />
-
         <Button
             android:id="@+id/b5"
             android:text="5" />
-
         <Button
             android:id="@+id/b6"
             android:text="6" />
-
         <Button
             android:id="@+id/multiplication"
             android:text="*" />
-
         <Button
             android:id="@+id/b7"
             android:text="7" />
-
         <Button
             android:id="@+id/b8"
             android:text="8" />
-
         <Button
             android:id="@+id/b9"
             android:text="9" />
-
         <Button
             android:id="@+id/soustraction"
             android:text="-" />
-
         <Button
             android:id="@+id/point"
             android:text="." />
-
         <Button
             android:id="@+id/b0"
             android:text="0" />
-
         <Button
             android:id="@+id/egalite"
             android:text="=" />
-
         <Button
             android:id="@+id/addition"
             android:text="+" />
-
     </GridLayout>
 </LinearLayout>

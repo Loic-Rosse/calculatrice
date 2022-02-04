@@ -12,16 +12,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // Déclaration
     private TextView number;
-
-    private double num1=0;
-    private double num2=0;
-    private double ans = 0;
-
-    private boolean add;
-    private boolean minus;
-    private boolean product;
-    private boolean divide;
-    private boolean decimal;
+    private String saisieInvalide = "Saisie invalide";
 
     private Button b1;
     private Button b2;
@@ -87,6 +78,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         egalite.setOnClickListener(this);
     }
 
+    /****
+     * Affecte les différentes valeurs des boutons à la TextView
+     * @param view
+     */
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -139,34 +134,99 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 number.append("/");
                 break;
             case R.id.egalite:
-                onClickButtonEqual();
+                String calcul = number.getText().toString();
+                number.setText("");
+                String resultat = String.valueOf(eval(calcul));
+                setText(resultat);
                 break;
         }
     }
-    public void onClickButtonEqual() {
-        if (add == true || minus == true || product == true || divide == true) {
-            if (number.getText() != null ) {
-                num2 = Float.parseFloat(number.getText() + "");
-                number.setText(number.getText() + " " + number.getText());
 
-                if (add == true)
-                    ans = num1 + num2;
-                add = false;
-                if (minus == true)
-                    ans = num1 - num2;
-                minus = false;
-                if (product == true)
-                    ans = num1 * num2;
-                product = false;
-                if (divide == true)
-                    ans = num1 / num2;
-                divide = false;
+    /**
+     * Affiche le resultat à la TextView
+     * @param text
+     */
+    private void setText(String text) {
+        number.setText(text);
+    }
 
-                number.setText(ans + "");
-                num2 = ans;
-                num1 = 0;
+    /**
+     * Calcul les différentes opérations
+     * @param str
+     * @return
+     */
+    public static double eval(final String str) {
+        return new Object() {
+            int pos = -1, ch;
+
+            void nextChar() {
+                ch = (++pos < str.length()) ? str.charAt(pos) : -1;
             }
-        }
+
+            boolean eat(int charToEat) {
+                while (ch == ' ') nextChar();
+                if (ch == charToEat) {
+                    nextChar();
+                    return true;
+                }
+                return false;
+            }
+
+            double parse() {
+                nextChar();
+                double x = parseExpression();
+                if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char)ch);
+                return x;
+            }
+
+            double parseExpression() {
+                double x = parseTerm();
+                for (;;) {
+                    if      (eat('+')) x += parseTerm(); // addition
+                    else if (eat('-')) x -= parseTerm(); // subtraction
+                    else return x;
+                }
+            }
+
+            double parseTerm() {
+                double x = parseFactor();
+                for (;;) {
+                    if      (eat('*')) x *= parseFactor(); // multiplication
+                    else if (eat('/')) x /= parseFactor(); // division
+                    else return x;
+                }
+            }
+
+            double parseFactor() {
+                if (eat('+')) return parseFactor(); // unary plus
+                if (eat('-')) return -parseFactor(); // unary minus
+
+                double x;
+                int startPos = this.pos;
+                if (eat('(')) { // parentheses
+                    x = parseExpression();
+                    eat(')');
+                } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
+                    while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
+                    x = Double.parseDouble(str.substring(startPos, this.pos));
+                } else if (ch >= 'a' && ch <= 'z') { // functions
+                    while (ch >= 'a' && ch <= 'z') nextChar();
+                    String func = str.substring(startPos, this.pos);
+                    x = parseFactor();
+                    if (func.equals("sqrt")) x = Math.sqrt(x);
+                    else if (func.equals("sin")) x = Math.sin(Math.toRadians(x));
+                    else if (func.equals("cos")) x = Math.cos(Math.toRadians(x));
+                    else if (func.equals("tan")) x = Math.tan(Math.toRadians(x));
+                    else throw new RuntimeException("Unknown function: " + func);
+                } else {
+                    throw new RuntimeException("Unexpected: " + (char)ch);
+                }
+
+                if (eat('^')) x = Math.pow(x, parseFactor()); // exponentiation
+
+                return x;
+            }
+        }.parse();
     }
 }
 
